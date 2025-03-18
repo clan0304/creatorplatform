@@ -113,12 +113,6 @@ const CreatorsPage = () => {
             </div>
           )}
         </div>
-
-        <p className="text-gray-600 max-w-3xl">
-          Discover talented creators available for your projects. Each creator
-          brings unique skills and expertise. Browse through their profiles and
-          travel schedules to find the perfect match for your creative needs.
-        </p>
       </div>
 
       <CreatorContainer

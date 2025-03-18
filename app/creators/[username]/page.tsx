@@ -13,6 +13,7 @@ interface Profile {
   profile_photo_url?: string;
   location?: string;
   languages?: string[];
+  portfolio_items: string[];
   social_links?: {
     instagram?: string;
     youtube?: string;
@@ -307,6 +308,106 @@ const CreatorProfilePage = () => {
             </div>
           </div>
 
+          {profile?.portfolio_items && profile.portfolio_items.length > 0 && (
+            <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8">
+              <div className="p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">
+                  Portfolio
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {profile.portfolio_items.map((item, index) => {
+                    // Check if the item is a video by testing against common video extensions
+                    const videoExtensions = [
+                      '.mp4',
+                      '.mov',
+                      '.avi',
+                      '.webm',
+                      '.mkv',
+                      '.wmv',
+                      '.flv',
+                      '.m4v',
+                      '.3gp',
+                      '.ogv',
+                    ];
+                    const isVideo = videoExtensions.some((ext) =>
+                      item.toLowerCase().endsWith(ext)
+                    );
+
+                    // Alternative approach: check for video MIME type in the URL if it exists
+                    const hasVideoParam =
+                      item.includes('video') ||
+                      item.includes('content-type=video');
+
+                    return (
+                      <div
+                        key={index}
+                        className="relative overflow-hidden rounded-lg group"
+                      >
+                        <div className="aspect-w-16 aspect-h-9 bg-gray-100">
+                          {isVideo || hasVideoParam ? (
+                            // Video portfolio item
+                            <video
+                              src={item}
+                              className="w-full h-full object-cover"
+                              controls
+                              preload="metadata"
+                              onError={(e) => {
+                                console.error('Video failed to load:', item);
+                                // Replace broken video with placeholder
+                                (e.target as HTMLVideoElement).style.display =
+                                  'none';
+                                const parent = (e.target as HTMLVideoElement)
+                                  .parentElement;
+                                if (parent) {
+                                  parent.classList.add(
+                                    'flex',
+                                    'items-center',
+                                    'justify-center'
+                                  );
+                                  parent.innerHTML +=
+                                    '<div class="text-gray-400"><svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><p class="mt-2 text-sm">Video unavailable</p></div>';
+                                }
+                              }}
+                            />
+                          ) : (
+                            // Image portfolio item
+                            <Image
+                              src={item}
+                              alt={`Portfolio item ${index + 1}`}
+                              width={500}
+                              height={300}
+                              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                              onError={(e) => {
+                                console.error('Image failed to load:', item);
+                                // Replace broken image with placeholder
+                                const target = e.target as HTMLImageElement;
+                                target.src =
+                                  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="500" height="300" viewBox="0 0 500 300"><rect width="100%" height="100%" fill="%23f1f5f9"/><text x="50%" y="50%" font-family="Arial" font-size="20" text-anchor="middle" fill="%2394a3b8">Image not available</text></svg>';
+                                target.onerror = null; // Prevent infinite loops
+                              }}
+                            />
+                          )}
+                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                          <div className="p-4 w-full flex justify-between items-center">
+                            <span className="text-white text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+                              {isVideo ? 'Video' : 'Image'} {index + 1}
+                            </span>
+                            <button
+                              className="text-white text-sm bg-indigo-600/90 hover:bg-indigo-700 py-1.5 px-3 rounded-md transition-colors"
+                              onClick={() => window.open(item, '_blank')}
+                            >
+                              View Full Size
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
           {/* Additional content sections can be added here */}
         </div>
 
