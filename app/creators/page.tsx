@@ -16,26 +16,24 @@ const CreatorsPage = () => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isTravelModalOpen, setIsTravelModalOpen] = useState(false);
 
-  // User-specific states
+  // User-specific states (only relevant for authenticated creators)
   const [userDescription, setUserDescription] = useState<string | null>(null);
   const [userCountry, setUserCountry] = useState<string | null>(null);
   const [userCity, setUserCity] = useState<string | null>(null);
   const [hasCreatorProfile, setHasCreatorProfile] = useState(false);
   const [hasTravelSchedule, setHasTravelSchedule] = useState(false);
 
-  // Search and filter states
+  // Search and filter states (available to all users)
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCountry, setSelectedCountry] = useState('');
   const [availableCountries, setAvailableCountries] = useState<string[]>([]);
 
-  // Fetch user-specific data
+  // Fetch user-specific data (only for authenticated users)
   useEffect(() => {
-    // Only fetch user data if a user is logged in
-    if (!user) return;
+    if (!user) return; // Skip if no user is logged in
 
     const fetchUserData = async () => {
       try {
-        // Check if user has a creator profile
         const { data: profileData } = await supabase
           .from('creator_profile')
           .select('description, country, city')
@@ -48,7 +46,6 @@ const CreatorsPage = () => {
           setUserCity(profileData.city || '');
           setHasCreatorProfile(true);
 
-          // Check if user has travel schedules
           const { data: travelData } = await supabase
             .from('creator_travel_schedule')
             .select('id')
@@ -67,11 +64,10 @@ const CreatorsPage = () => {
     fetchUserData();
   }, [user]);
 
-  // Fetch available countries for filter
+  // Fetch available countries for filter (runs for all users)
   useEffect(() => {
     const fetchAvailableCountries = async () => {
       try {
-        // First, get countries from creator profiles
         const { data: profileCountries, error: profileError } = await supabase
           .from('creator_profile')
           .select('country')
@@ -79,7 +75,6 @@ const CreatorsPage = () => {
 
         if (profileError) throw profileError;
 
-        // Then, get countries from travel schedules
         const { data: travelCountries, error: travelError } = await supabase
           .from('creator_travel_schedule')
           .select('country')
@@ -87,15 +82,12 @@ const CreatorsPage = () => {
 
         if (travelError) throw travelError;
 
-        // Combine and get unique countries
         const allCountries = [
           ...(profileCountries || []).map((item) => item.country),
           ...(travelCountries || []).map((item) => item.country),
         ];
 
-        // Extract unique countries and sort them
         const countries = [...new Set(allCountries.filter(Boolean))].sort();
-
         setAvailableCountries(countries as string[]);
       } catch (err) {
         console.error('Error fetching available countries:', err);
@@ -141,7 +133,6 @@ const CreatorsPage = () => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // Filtering is handled by the CreatorContainer component
   };
 
   const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -160,6 +151,7 @@ const CreatorsPage = () => {
             Creators
           </h1>
 
+          {/* Show buttons only for authenticated creators */}
           {user && isCreator && (
             <div className="flex space-x-3">
               <button
@@ -189,10 +181,9 @@ const CreatorsPage = () => {
           perfect match for your needs.
         </p>
 
-        {/* Filter/Search Section */}
+        {/* Filter/Search Section - Available to all users */}
         <form onSubmit={handleSearch} className="mb-6">
           <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-3">
-            {/* Search Input */}
             <div className="flex-grow flex md:w-1/2">
               <input
                 type="text"
@@ -209,7 +200,6 @@ const CreatorsPage = () => {
               </button>
             </div>
 
-            {/* Country Dropdown */}
             <div className="md:w-64">
               <select
                 value={selectedCountry}
@@ -228,9 +218,9 @@ const CreatorsPage = () => {
         </form>
       </div>
 
-      {/* Creator profiles - accessible to all visitors */}
+      {/* Creator profiles - Accessible to all users */}
       <CreatorContainer
-        user={user}
+        user={user} // Can be null for non-authenticated users
         isCreator={isCreator || false}
         setIsProfileModalOpen={setIsProfileModalOpen}
         setIsTravelModalOpen={setIsTravelModalOpen}
@@ -240,38 +230,39 @@ const CreatorsPage = () => {
         selectedCountry={selectedCountry}
       />
 
-      {/* Creator Profile Modal - only for logged-in creators */}
+      {/* Modals - Only for authenticated creators */}
       {user && isCreator && (
-        <Modal
-          isOpen={isProfileModalOpen}
-          onClose={() => setIsProfileModalOpen(false)}
-          title={
-            hasCreatorProfile ? 'Edit Creator Profile' : 'Add Creator Profile'
-          }
-        >
-          <CreatorForm
-            initialDescription={userDescription || ''}
-            initialCountry={userCountry || ''}
-            initialCity={userCity || ''}
-            onSubmit={handleSaveProfile}
-            onCancel={() => setIsProfileModalOpen(false)}
-          />
-        </Modal>
-      )}
+        <>
+          <Modal
+            isOpen={isProfileModalOpen}
+            onClose={() => setIsProfileModalOpen(false)}
+            title={
+              hasCreatorProfile ? 'Edit Creator Profile' : 'Add Creator Profile'
+            }
+          >
+            <CreatorForm
+              initialDescription={userDescription || ''}
+              initialCountry={userCountry || ''}
+              initialCity={userCity || ''}
+              onSubmit={handleSaveProfile}
+              onCancel={() => setIsProfileModalOpen(false)}
+            />
+          </Modal>
 
-      {/* Travel Schedule Modal - only for logged-in creators */}
-      {user && isCreator && hasCreatorProfile && (
-        <Modal
-          isOpen={isTravelModalOpen}
-          onClose={() => setIsTravelModalOpen(false)}
-          title="Travel Schedule"
-          size="lg"
-        >
-          <TravelScheduleForm
-            creatorId={user.id}
-            onCancel={() => setIsTravelModalOpen(false)}
-          />
-        </Modal>
+          {hasCreatorProfile && (
+            <Modal
+              isOpen={isTravelModalOpen}
+              onClose={() => setIsTravelModalOpen(false)}
+              title="Travel Schedule"
+              size="lg"
+            >
+              <TravelScheduleForm
+                creatorId={user.id}
+                onCancel={() => setIsTravelModalOpen(false)}
+              />
+            </Modal>
+          )}
+        </>
       )}
     </div>
   );
