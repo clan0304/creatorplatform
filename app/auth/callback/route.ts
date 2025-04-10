@@ -1,4 +1,3 @@
-// app/auth/callback/route.ts
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
@@ -7,14 +6,16 @@ export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get('code');
 
-  if (code) {
-    const cookieStore = cookies();
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+  const cookieStore = cookies();
+  const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
 
-    // Exchange the code for a session
-    await supabase.auth.exchangeCodeForSession(code);
+  try {
+    // If we have a code, exchange it for a session
+    if (code) {
+      await supabase.auth.exchangeCodeForSession(code);
+    }
 
-    // Create a new user profile if it doesn't exist yet
+    // Verify we have a session, regardless of how we got it
     const {
       data: { session },
     } = await supabase.auth.getSession();
@@ -41,9 +42,18 @@ export async function GET(request: NextRequest) {
           console.error('Error creating user profile:', error);
         }
       }
+
+      // Redirect to dashboard or profile completion based on profile status
+      if (existingProfile?.is_profile_complete) {
+        return NextResponse.redirect(new URL('/', request.url));
+      } else {
+        return NextResponse.redirect(new URL('/auth', request.url));
+      }
     }
+  } catch (error) {
+    console.error('Auth callback error:', error);
   }
 
-  // Redirect to the auth page to complete profile setup
+  // If anything fails, redirect to auth page
   return NextResponse.redirect(new URL('/auth', request.url));
 }

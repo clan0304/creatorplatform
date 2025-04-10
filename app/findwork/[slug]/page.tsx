@@ -24,14 +24,15 @@ interface BusinessProfile {
   id: string;
   business_id: string;
   business_name: string;
-  business_address: string;
+  title: string;
   description: string;
+  slug?: string;
   created_at: string;
   updated_at: string;
 }
 
 const BusinessProfilePage = () => {
-  const { username } = useParams();
+  const { slug } = useParams();
   const { user } = useAuth();
 
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -45,45 +46,66 @@ const BusinessProfilePage = () => {
     const fetchBusinessData = async () => {
       setIsLoading(true);
       try {
-        // 1. Get the profile by username
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('username', username)
-          .single();
-
-        if (profileError) {
-          if (profileError.code === 'PGRST116') {
-            // Profile not found
-            notFound();
-          }
-          throw profileError;
-        }
-
-        // Set profile data
-        setProfile(profileData);
-
-        // Check if this is the current user's profile
-        if (user && profileData.id === user.id) {
-          setIsCurrentUser(true);
-        }
-
-        // 2. Get business profile data
+        // First try to find the business profile by slug
         const { data: businessData, error: businessError } = await supabase
           .from('business_profile')
           .select('*')
-          .eq('business_id', profileData.id)
-          .single();
+          .eq('slug', slug)
+          .maybeSingle();
 
-        if (businessError) {
-          if (businessError.code !== 'PGRST116') {
-            throw businessError;
-          } else if (profileData.user_type !== 'business') {
-            // This user isn't a business
+        // If not found by slug, try by ID (for backward compatibility)
+        if (!businessData && businessError) {
+          const { data: idBusinessData, error: idBusinessError } =
+            await supabase
+              .from('business_profile')
+              .select('*')
+              .eq('id', slug)
+              .maybeSingle();
+
+          if (idBusinessError || !idBusinessData) {
             notFound();
           }
+
+          setBusinessProfile(idBusinessData);
+
+          // Get profile data for the business
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', idBusinessData.business_id)
+            .single();
+
+          if (profileError) {
+            throw profileError;
+          }
+
+          setProfile(profileData);
+
+          // Check if this is the current user's profile
+          if (user && profileData.id === user.id) {
+            setIsCurrentUser(true);
+          }
         } else {
+          // Business was found by slug
           setBusinessProfile(businessData);
+
+          // Get profile data for the business
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', businessData.business_id)
+            .single();
+
+          if (profileError) {
+            throw profileError;
+          }
+
+          setProfile(profileData);
+
+          // Check if this is the current user's profile
+          if (user && profileData.id === user.id) {
+            setIsCurrentUser(true);
+          }
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
@@ -94,10 +116,10 @@ const BusinessProfilePage = () => {
       }
     };
 
-    if (username) {
+    if (slug) {
       fetchBusinessData();
     }
-  }, [username, user]);
+  }, [slug, user]);
 
   if (isLoading) {
     return (
@@ -160,7 +182,7 @@ const BusinessProfilePage = () => {
 
           <div className="mt-16">
             <h1 className="text-3xl font-bold text-gray-900">
-              {businessProfile?.business_name}
+              {businessProfile?.title || businessProfile?.business_name}
             </h1>
             <p className="text-gray-600 flex items-center mt-1">
               <span className="font-medium text-gray-700 mr-2">
@@ -320,14 +342,7 @@ const BusinessProfilePage = () => {
                     {businessProfile?.business_name}
                   </span>
                 </li>
-                <li className="flex items-start">
-                  <span className="font-medium text-gray-700 w-24">
-                    Address:
-                  </span>
-                  <span className="text-gray-600">
-                    {businessProfile?.business_address}
-                  </span>
-                </li>
+
                 <li className="flex items-start">
                   <span className="font-medium text-gray-700 w-24">
                     Location:

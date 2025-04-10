@@ -16,7 +16,7 @@ export const featureData = [
         />
       </svg>
     ),
-    title: 'Content Creation Tools',
+    title: 'Find digital Creators',
     description:
       'Access professional-grade tools to create stunning content that stands out in a crowded digital landscape.',
   },

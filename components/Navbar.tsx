@@ -29,6 +29,7 @@ const Navbar = () => {
       <div className="flex gap-3 items-center">
         <Link href="/creators">Creators</Link>
         <Link href="/findwork">Find Work</Link>
+        <Link href="/aboutus">About Us</Link>
 
         {isSignedIn ? (
           <div className="relative">

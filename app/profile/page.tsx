@@ -13,7 +13,7 @@ interface Profile {
   username: string;
   profile_photo_url?: string;
   user_type: 'creator' | 'business';
-  location?: string;
+
   languages?: string[];
   social_links?: {
     instagram?: string;
@@ -32,7 +32,7 @@ interface BusinessProfile {
   id?: string;
   business_id?: string;
   business_name: string;
-  business_address: string;
+
   description: string;
 }
 
@@ -52,9 +52,10 @@ const ProfilePage = () => {
   const [hasTravelSchedule, setHasTravelSchedule] = useState(false);
   const [activeTab, setActiveTab] = useState<'general' | 'advanced'>('general');
 
+  // Function to convert customized country name back to original country-list name
+
   // Form fields
   const [username, setUsername] = useState('');
-  const [location, setLocation] = useState('');
   const [languages, setLanguages] = useState<string[]>([]);
   const [newLanguage, setNewLanguage] = useState('');
   const [instagramUrl, setInstagramUrl] = useState('');
@@ -62,7 +63,6 @@ const ProfilePage = () => {
   const [tiktokUrl, setTiktokUrl] = useState('');
   const [description, setDescription] = useState('');
   const [businessName, setBusinessName] = useState('');
-  const [businessAddress, setBusinessAddress] = useState('');
   const [profilePhotoFile, setProfilePhotoFile] = useState<File | null>(null);
   const [profilePhotoPreview, setProfilePhotoPreview] = useState<string | null>(
     null
@@ -91,7 +91,6 @@ const ProfilePage = () => {
 
         setProfile(profileData);
         setUsername(profileData.username || '');
-        setLocation(profileData.location || '');
         setLanguages(profileData.languages || []);
 
         if (profileData.social_links) {
@@ -139,7 +138,7 @@ const ProfilePage = () => {
           if (businessData) {
             setBusinessProfile(businessData);
             setBusinessName(businessData.business_name || '');
-            setBusinessAddress(businessData.business_address || '');
+
             setDescription(businessData.description || '');
           }
         }
@@ -206,9 +205,8 @@ const ProfilePage = () => {
 
     try {
       const fileExt = profilePhotoFile.name.split('.').pop();
-      const filePath = `profile-photos/${
-        user?.id
-      }/profile-${Date.now()}.${fileExt}`;
+      // Remove the bucket name from the path - it's automatically included
+      const filePath = `${user?.id}/profile-${Date.now()}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
         .from('profile-photos')
@@ -224,7 +222,7 @@ const ProfilePage = () => {
       return data.publicUrl;
     } catch (err: any) {
       console.error('Error uploading profile photo:', err);
-      setError('Failed to upload profile photo');
+      setError('Failed to upload profile photo: ' + err.message);
       return undefined;
     }
   };
@@ -250,7 +248,6 @@ const ProfilePage = () => {
         .from('profiles')
         .update({
           username,
-          location,
           languages,
           profile_photo_url: photoUrl,
           social_links: {
@@ -280,7 +277,6 @@ const ProfilePage = () => {
           .from('business_profile')
           .update({
             business_name: businessName,
-            business_address: businessAddress,
             description,
             updated_at: new Date().toISOString(),
           })
@@ -295,7 +291,6 @@ const ProfilePage = () => {
       setProfile({
         ...profile!,
         username,
-        location,
         languages,
         profile_photo_url: photoUrl,
         social_links: {
@@ -314,7 +309,6 @@ const ProfilePage = () => {
         setBusinessProfile({
           ...businessProfile!,
           business_name: businessName,
-          business_address: businessAddress,
           description,
         });
       }
@@ -441,24 +435,6 @@ const ProfilePage = () => {
                   onChange={(e) => setUsername(e.target.value)}
                   className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   required
-                />
-              </div>
-
-              {/* Location */}
-              <div>
-                <label
-                  htmlFor="location"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Location
-                </label>
-                <input
-                  type="text"
-                  id="location"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  placeholder="City, Country"
                 />
               </div>
 
@@ -592,23 +568,6 @@ const ProfilePage = () => {
                       id="business-name"
                       value={businessName}
                       onChange={(e) => setBusinessName(e.target.value)}
-                      className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="business-address"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Business Address
-                    </label>
-                    <input
-                      type="text"
-                      id="business-address"
-                      value={businessAddress}
-                      onChange={(e) => setBusinessAddress(e.target.value)}
                       className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       required
                     />

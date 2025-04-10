@@ -16,8 +16,6 @@ const BusinessProfileForm: React.FC<BusinessProfileFormProps> = ({
   onComplete,
 }) => {
   const [businessName, setBusinessName] = useState('');
-  const [address, setAddress] = useState('');
-  const [location, setLocation] = useState('');
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
   const [profilePhotoPreview, setProfilePhotoPreview] = useState<string | null>(
     null
@@ -84,8 +82,6 @@ const BusinessProfileForm: React.FC<BusinessProfileFormProps> = ({
 
       const profileData = {
         business_name: businessName,
-        business_address: address,
-        location,
         profile_photo_url: profilePhotoUrl,
         user_type: 'business',
       };
@@ -158,46 +154,6 @@ const BusinessProfileForm: React.FC<BusinessProfileFormProps> = ({
               onChange={(e) => setBusinessName(e.target.value)}
               className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               placeholder="Your Business Name"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label
-            htmlFor="address"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Business Address
-          </label>
-          <div className="mt-1">
-            <textarea
-              id="address"
-              required
-              rows={3}
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              placeholder="Street Address, City, State, Zip/Postal Code"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label
-            htmlFor="location"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Location
-          </label>
-          <div className="mt-1">
-            <input
-              type="text"
-              id="location"
-              required
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              placeholder="City, Country"
             />
           </div>
         </div>

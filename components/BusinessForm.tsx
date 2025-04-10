@@ -1,18 +1,23 @@
-// components/BusinessForm.tsx with basic formatting controls
+// components/BusinessForm.tsx with basic formatting controls and country/city fields
 'use client';
 
 import React, { useState, useRef } from 'react';
+import { getNames } from 'country-list';
 
 interface BusinessFormProps {
   initialValues: {
     description: string;
     business_name: string;
-    business_address: string;
+    title: string;
+    business_country?: string;
+    business_city?: string;
   };
   onSubmit: (values: {
     description: string;
     business_name: string;
-    business_address: string;
+    title: string;
+    business_country?: string;
+    business_city?: string;
   }) => void;
   onCancel: () => void;
 }
@@ -22,14 +27,51 @@ const BusinessForm: React.FC<BusinessFormProps> = ({
   onSubmit,
   onCancel,
 }) => {
-  const [values, setValues] = useState(initialValues);
+  const [values, setValues] = useState({
+    business_country: '',
+    business_city: '',
+    ...initialValues,
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const maxDescriptionLength = 1000;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Function to convert original country-list name to our customized name
+  const getCustomizedCountryName = (originalName: string): string => {
+    const countryNameOverrides: Record<string, string> = {
+      'Taiwan, Province of China': 'Taiwan',
+    };
+
+    return countryNameOverrides[originalName] || originalName;
+  };
+
+  // Function to convert customized country name back to original country-list name
+  const getOriginalCountryName = (customizedName: string): string => {
+    // Create a reverse mapping from custom names to original names
+    const reverseOverrides: Record<string, string> = {
+      Taiwan: 'Taiwan, Province of China',
+    };
+
+    return reverseOverrides[customizedName] || customizedName;
+  };
+
+  // Get list of countries from country-list package and customize certain names
+  const getCustomizedCountries = () => {
+    const originalCountries = getNames().sort();
+
+    // Apply the overrides
+    return originalCountries.map((countryName) =>
+      getCustomizedCountryName(countryName)
+    );
+  };
+
+  const countries = getCustomizedCountries();
+
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
     setValues({
@@ -48,8 +90,8 @@ const BusinessForm: React.FC<BusinessFormProps> = ({
       return;
     }
 
-    if (!values.business_address.trim()) {
-      setError('Business address cannot be empty');
+    if (!values.title.trim()) {
+      setError('Title cannot be empty');
       return;
     }
 
@@ -68,7 +110,15 @@ const BusinessForm: React.FC<BusinessFormProps> = ({
     setIsSubmitting(true);
 
     try {
-      await onSubmit(values);
+      // Convert customized country name back to original for submission
+      const originalCountryName = values.business_country
+        ? getOriginalCountryName(values.business_country)
+        : undefined;
+
+      await onSubmit({
+        ...values,
+        business_country: originalCountryName,
+      });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err.message || 'An error occurred while saving');
@@ -166,21 +216,67 @@ const BusinessForm: React.FC<BusinessFormProps> = ({
 
       <div>
         <label
-          htmlFor="business_address"
+          htmlFor="title"
           className="block text-sm font-medium text-gray-700 mb-1"
         >
-          Business Address
+          Title
         </label>
         <input
-          id="business_address"
-          name="business_address"
+          id="title"
+          name="title"
           type="text"
-          value={values.business_address}
+          value={values.title}
           onChange={handleChange}
           className="block w-full rounded-md border border-gray-300 shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          placeholder="Full Address"
+          placeholder="Title"
           disabled={isSubmitting}
         />
+      </div>
+
+      {/* Country and City fields */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label
+            htmlFor="business_country"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Country
+          </label>
+          <select
+            id="business_country"
+            name="business_country"
+            value={values.business_country}
+            onChange={handleChange}
+            className="block w-full rounded-md border border-gray-300 shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            disabled={isSubmitting}
+          >
+            <option value="">Select a country</option>
+            {countries.map((countryName) => (
+              <option key={countryName} value={countryName}>
+                {countryName}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label
+            htmlFor="business_city"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            City
+          </label>
+          <input
+            id="business_city"
+            name="business_city"
+            type="text"
+            value={values.business_city}
+            onChange={handleChange}
+            className="block w-full rounded-md border border-gray-300 shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            placeholder="City"
+            disabled={isSubmitting}
+          />
+        </div>
       </div>
 
       <div>

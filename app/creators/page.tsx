@@ -18,24 +18,34 @@ const CreatorsPage = () => {
 
   // User-specific states
   const [userDescription, setUserDescription] = useState<string | null>(null);
+  const [userCountry, setUserCountry] = useState<string | null>(null);
+  const [userCity, setUserCity] = useState<string | null>(null);
   const [hasCreatorProfile, setHasCreatorProfile] = useState(false);
   const [hasTravelSchedule, setHasTravelSchedule] = useState(false);
 
+  // Search and filter states
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCountry, setSelectedCountry] = useState('');
+  const [availableCountries, setAvailableCountries] = useState<string[]>([]);
+
   // Fetch user-specific data
   useEffect(() => {
-    const fetchUserData = async () => {
-      if (!user) return;
+    // Only fetch user data if a user is logged in
+    if (!user) return;
 
+    const fetchUserData = async () => {
       try {
         // Check if user has a creator profile
         const { data: profileData } = await supabase
           .from('creator_profile')
-          .select('description')
+          .select('description, country, city')
           .eq('creator_id', user.id)
           .single();
 
         if (profileData) {
           setUserDescription(profileData.description);
+          setUserCountry(profileData.country || '');
+          setUserCity(profileData.city || '');
           setHasCreatorProfile(true);
 
           // Check if user has travel schedules
@@ -57,14 +67,58 @@ const CreatorsPage = () => {
     fetchUserData();
   }, [user]);
 
-  const handleSaveDescription = async (description: string) => {
+  // Fetch available countries for filter
+  useEffect(() => {
+    const fetchAvailableCountries = async () => {
+      try {
+        // First, get countries from creator profiles
+        const { data: profileCountries, error: profileError } = await supabase
+          .from('creator_profile')
+          .select('country')
+          .not('country', 'is', null);
+
+        if (profileError) throw profileError;
+
+        // Then, get countries from travel schedules
+        const { data: travelCountries, error: travelError } = await supabase
+          .from('creator_travel_schedule')
+          .select('country')
+          .not('country', 'is', null);
+
+        if (travelError) throw travelError;
+
+        // Combine and get unique countries
+        const allCountries = [
+          ...(profileCountries || []).map((item) => item.country),
+          ...(travelCountries || []).map((item) => item.country),
+        ];
+
+        // Extract unique countries and sort them
+        const countries = [...new Set(allCountries.filter(Boolean))].sort();
+
+        setAvailableCountries(countries as string[]);
+      } catch (err) {
+        console.error('Error fetching available countries:', err);
+      }
+    };
+
+    fetchAvailableCountries();
+  }, []);
+
+  const handleSaveProfile = async (data: {
+    description: string;
+    country: string;
+    city: string;
+  }) => {
     if (!user) return;
 
     try {
       const { error } = await supabase.from('creator_profile').upsert(
         {
           creator_id: user.id,
-          description,
+          description: data.description,
+          country: data.country,
+          city: data.city,
           updated_at: new Date().toISOString(),
         },
         { onConflict: 'creator_id' }
@@ -72,7 +126,9 @@ const CreatorsPage = () => {
 
       if (error) throw error;
 
-      setUserDescription(description);
+      setUserDescription(data.description);
+      setUserCountry(data.country);
+      setUserCity(data.city);
       setHasCreatorProfile(true);
       setIsProfileModalOpen(false);
 
@@ -83,6 +139,19 @@ const CreatorsPage = () => {
     }
   };
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Filtering is handled by the CreatorContainer component
+  };
+
+  const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCountry(e.target.value);
+  };
+
   return (
     <div className="container mx-auto p-6">
       <div className="mb-8">
@@ -91,7 +160,7 @@ const CreatorsPage = () => {
             Creators
           </h1>
 
-          {isCreator && (
+          {user && isCreator && (
             <div className="flex space-x-3">
               <button
                 onClick={() => setIsProfileModalOpen(true)}
@@ -113,19 +182,66 @@ const CreatorsPage = () => {
             </div>
           )}
         </div>
+
+        <p className="text-gray-600 max-w-3xl mb-6">
+          Browse talented creators from around the world. Connect with creators
+          based on their location, languages, and travel schedule to find the
+          perfect match for your needs.
+        </p>
+
+        {/* Filter/Search Section */}
+        <form onSubmit={handleSearch} className="mb-6">
+          <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-3">
+            {/* Search Input */}
+            <div className="flex-grow flex md:w-1/2">
+              <input
+                type="text"
+                placeholder="Search for creators..."
+                value={searchQuery}
+                onChange={handleSearchInputChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+              <button
+                type="submit"
+                className="px-4 py-2 bg-indigo-600 text-white rounded-r-md hover:bg-indigo-700 transition-colors"
+              >
+                Search
+              </button>
+            </div>
+
+            {/* Country Dropdown */}
+            <div className="md:w-64">
+              <select
+                value={selectedCountry}
+                onChange={handleCountryChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+              >
+                <option value="">All Countries</option>
+                {availableCountries.map((country) => (
+                  <option key={country} value={country}>
+                    {country}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </form>
       </div>
 
+      {/* Creator profiles - accessible to all visitors */}
       <CreatorContainer
         user={user}
-        isCreator={isCreator}
+        isCreator={isCreator || false}
         setIsProfileModalOpen={setIsProfileModalOpen}
         setIsTravelModalOpen={setIsTravelModalOpen}
         userHasCreatorProfile={hasCreatorProfile}
         userHasTravelSchedule={hasTravelSchedule}
+        searchQuery={searchQuery}
+        selectedCountry={selectedCountry}
       />
 
-      {/* Creator Profile Modal */}
-      {isCreator && (
+      {/* Creator Profile Modal - only for logged-in creators */}
+      {user && isCreator && (
         <Modal
           isOpen={isProfileModalOpen}
           onClose={() => setIsProfileModalOpen(false)}
@@ -135,14 +251,16 @@ const CreatorsPage = () => {
         >
           <CreatorForm
             initialDescription={userDescription || ''}
-            onSubmit={handleSaveDescription}
+            initialCountry={userCountry || ''}
+            initialCity={userCity || ''}
+            onSubmit={handleSaveProfile}
             onCancel={() => setIsProfileModalOpen(false)}
           />
         </Modal>
       )}
 
-      {/* Travel Schedule Modal */}
-      {isCreator && hasCreatorProfile && user && (
+      {/* Travel Schedule Modal - only for logged-in creators */}
+      {user && isCreator && hasCreatorProfile && (
         <Modal
           isOpen={isTravelModalOpen}
           onClose={() => setIsTravelModalOpen(false)}

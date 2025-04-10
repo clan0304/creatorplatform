@@ -314,7 +314,7 @@ const CreatorProfilePage = () => {
                 <h2 className="text-xl font-bold text-gray-900 mb-4">
                   Portfolio
                 </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {profile.portfolio_items.map((item, index) => {
                     // Check if the item is a video by testing against common video extensions
                     const videoExtensions = [
@@ -343,7 +343,8 @@ const CreatorProfilePage = () => {
                         key={index}
                         className="relative overflow-hidden rounded-lg group"
                       >
-                        <div className="aspect-w-16 aspect-h-9 bg-gray-100">
+                        {/* Square aspect ratio container */}
+                        <div className="aspect-w-1 aspect-h-1 bg-gray-100">
                           {isVideo || hasVideoParam ? (
                             // Video portfolio item
                             <video
@@ -375,14 +376,14 @@ const CreatorProfilePage = () => {
                               src={item}
                               alt={`Portfolio item ${index + 1}`}
                               width={500}
-                              height={300}
+                              height={500}
                               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                               onError={(e) => {
                                 console.error('Image failed to load:', item);
                                 // Replace broken image with placeholder
                                 const target = e.target as HTMLImageElement;
                                 target.src =
-                                  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="500" height="300" viewBox="0 0 500 300"><rect width="100%" height="100%" fill="%23f1f5f9"/><text x="50%" y="50%" font-family="Arial" font-size="20" text-anchor="middle" fill="%2394a3b8">Image not available</text></svg>';
+                                  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500"><rect width="100%" height="100%" fill="%23f1f5f9"/><text x="50%" y="50%" font-family="Arial" font-size="20" text-anchor="middle" fill="%2394a3b8">Image not available</text></svg>';
                                 target.onerror = null; // Prevent infinite loops
                               }}
                             />
@@ -397,7 +398,7 @@ const CreatorProfilePage = () => {
                               className="text-white text-sm bg-indigo-600/90 hover:bg-indigo-700 py-1.5 px-3 rounded-md transition-colors"
                               onClick={() => window.open(item, '_blank')}
                             >
-                              View Full Size
+                              View Full
                             </button>
                           </div>
                         </div>

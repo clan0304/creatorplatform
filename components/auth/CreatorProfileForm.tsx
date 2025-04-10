@@ -20,7 +20,6 @@ const CreatorProfileForm: React.FC<CreatorProfileFormProps> = ({
   const [youtubeUrl, setYoutubeUrl] = useState('');
   const [tiktokUrl, setTiktokUrl] = useState('');
   const [portfolioUrl, setPortfolioUrl] = useState('');
-  const [location, setLocation] = useState('');
   const [languages, setLanguages] = useState<string[]>([]);
   const [languageInput, setLanguageInput] = useState('');
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
@@ -186,7 +185,6 @@ const CreatorProfileForm: React.FC<CreatorProfileFormProps> = ({
       const profileData = {
         social_links: socialLinks,
         portfolio_url: portfolioUrl || null,
-        location,
         languages,
         profile_photo_url: profilePhotoUrl,
         portfolio_items: portfolioUrls,
@@ -320,26 +318,6 @@ const CreatorProfileForm: React.FC<CreatorProfileFormProps> = ({
                 placeholder="https://yourportfolio.com"
               />
             </div>
-          </div>
-        </div>
-
-        <div>
-          <label
-            htmlFor="location"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Location
-          </label>
-          <div className="mt-1">
-            <input
-              type="text"
-              id="location"
-              required
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              placeholder="City, Country"
-            />
           </div>
         </div>
 
