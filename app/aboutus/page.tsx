@@ -7,7 +7,7 @@ const AboutUsPage = () => {
   return (
     <div className="bg-white">
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-r from-indigo-600 to-blue-500">
+      <div className="relative bg-gradient-to-r from-primary to-blue-700">
         <div className="max-w-7xl mx-auto py-24 px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
             Connecting Creators & Businesses
@@ -36,7 +36,7 @@ const AboutUsPage = () => {
             <div className="mt-6">
               <div className="flex">
                 <div className="flex-shrink-0">
-                  <div className="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white">
+                  <div className="flex items-center justify-center h-12 w-12 rounded-md bg-primary text-white">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -69,7 +69,7 @@ const AboutUsPage = () => {
               </div>
               <div className="flex mt-10">
                 <div className="flex-shrink-0">
-                  <div className="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white">
+                  <div className="flex items-center justify-center h-12 w-12 rounded-md bg-primary text-white">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"

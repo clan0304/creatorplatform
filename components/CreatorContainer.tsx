@@ -253,7 +253,7 @@ const CreatorContainer = ({
   };
 
   const navigateToProfile = (username: string) => {
-    router.push(`/${username}`);
+    router.push(`/creators/${username}`);
   };
 
   const formatDateRange = (startDate: string, endDate: string) => {

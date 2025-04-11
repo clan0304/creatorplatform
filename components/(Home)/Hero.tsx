@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -42,12 +43,18 @@ const Hero = () => {
             Let&apos;s Grow Together!
           </p>
           <div className="flex flex-col-reverse space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">
-            <Button size="lg" className="font-medium">
+            <Button size="lg" className="font-medium hover:cursor-pointer">
               Get Started
             </Button>
-            <Button variant="outline" size="lg" className="font-medium">
-              Learn More
-            </Button>
+            <Link href="/aboutus">
+              <Button
+                variant="outline"
+                size="lg"
+                className="font-medium hover:bg-primary hover:text-white cursor-pointer"
+              >
+                Learn More
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
