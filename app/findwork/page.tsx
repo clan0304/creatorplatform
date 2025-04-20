@@ -1,5 +1,7 @@
 'use client';
 
+import type React from 'react';
+
 import { useState, useEffect } from 'react';
 import supabase from '@/utils/supabase/client';
 import Modal from '@/components/Modal';
@@ -311,12 +313,30 @@ const FindworkPage = () => {
     <div className="container mx-auto p-4 max-w-5xl">
       <div className="mb-8">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">Find Work</h1>
+          <h1 className="text-3xl font-bold text-gray-800">Find Work</h1>
           {isBusiness && (
             <button
               onClick={() => setIsModalOpen(true)}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+              className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors shadow-sm flex items-center gap-2"
             >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="lucide lucide-building-2"
+              >
+                <path d="M6 22V2a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v20" />
+                <path d="M12 13V7" />
+                <path d="M10 10h4" />
+                <path d="M2 22h20" />
+                <path d="M19 22V11" />
+              </svg>
               {hasBusinessProfile
                 ? 'Edit Business Profile'
                 : 'Add Business Profile'}
@@ -324,63 +344,114 @@ const FindworkPage = () => {
           )}
         </div>
 
-        <p className="text-gray-600 max-w-3xl mb-6">
+        <p className="text-gray-600 max-w-3xl mb-8 text-lg">
           Browse businesses looking for talented creators. Each business profile
           shows what they&apos;re looking for and how to get in touch with them
           about potential work opportunities.
         </p>
 
-        {/* Filter/Search Section - Rearranged order */}
-        <form onSubmit={handleSearch} className="mb-6">
-          <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-3">
-            {/* Search Input - Now first */}
-            <div className="flex-grow flex md:w-1/2">
+        {/* Filter/Search Section */}
+        <form onSubmit={handleSearch} className="mb-8">
+          <div className="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-3">
+            {/* Search Input */}
+            <div className="flex-grow flex md:w-1/2 shadow-sm rounded-md overflow-hidden">
               <input
                 type="text"
                 placeholder="Search for opportunities..."
                 value={searchQuery}
                 onChange={handleSearchInputChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               />
               <button
                 type="submit"
-                className="px-4 py-2 bg-indigo-600 text-white rounded-r-md hover:bg-indigo-700 transition-colors"
+                className="px-5 py-3 bg-purple-600 text-white rounded-r-md hover:bg-purple-700 transition-colors hover:cursor-pointer flex items-center"
               >
-                Search
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="lucide lucide-search"
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.3-4.3" />
+                </svg>
               </button>
             </div>
 
-            {/* Country Dropdown - Now second */}
+            {/* Country Dropdown */}
             <div className="md:w-64">
-              <select
-                value={selectedCountry}
-                onChange={handleCountryChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
-              >
-                <option value="">All Countries</option>
-                {availableCountries.map((country) => (
-                  <option key={country} value={country}>
-                    {country}
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                <select
+                  value={selectedCountry}
+                  onChange={handleCountryChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white shadow-sm appearance-none"
+                >
+                  <option value="">All Countries</option>
+                  {availableCountries.map((country) => (
+                    <option key={country} value={country}>
+                      {country}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-chevron-down"
+                  >
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </div>
+              </div>
             </div>
           </div>
         </form>
       </div>
 
       {/* Job Listings */}
-      <div className="bg-white rounded-lg shadow divide-y divide-gray-200">
+      <div className="bg-white rounded-lg shadow-md divide-y divide-gray-200 overflow-hidden">
         {isLoading ? (
-          <div className="py-10 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500 mx-auto"></div>
-            <p className="mt-3 text-gray-600">Loading opportunities...</p>
+          <div className="py-16 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500 mx-auto"></div>
+            <p className="mt-4 text-gray-600 font-medium">
+              Loading opportunities...
+            </p>
           </div>
         ) : filteredBusinessProfiles.length === 0 ? (
-          <div className="py-10 text-center">
-            <p className="text-gray-600">
+          <div className="py-16 text-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="lucide lucide-search-x mx-auto text-gray-400 mb-4"
+            >
+              <path d="m13.5 8.5-5 5" />
+              <path d="m8.5 8.5 5 5" />
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.3-4.3" />
+            </svg>
+            <p className="text-gray-600 text-lg">
               {businessProfiles.length === 0
-                ? 'No business profiles available.'
+                ? 'No business profiles available yet.'
                 : 'No business profiles match your search criteria.'}
             </p>
           </div>
@@ -393,45 +464,52 @@ const FindworkPage = () => {
             >
               <div className="p-6 cursor-pointer">
                 <div className="flex flex-col">
-                  {/* Title at the top */}
-                  <h2 className="text-xl font-semibold text-indigo-700 mb-3">
+                  {/* Business name and date */}
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="text-sm font-medium text-gray-500">
+                      {business.business_name}
+                    </span>
+                    <span className="text-xs text-gray-400 whitespace-nowrap">
+                      Posted {formatDate(business.updated_at)}
+                    </span>
+                  </div>
+
+                  {/* Title */}
+                  <h2 className="text-xl font-semibold text-purple-700 mb-3 hover:text-purple-800">
                     {business.title}
                   </h2>
 
-                  {/* Description in the middle */}
-                  <p className="text-gray-600 mb-4">
+                  {/* Description */}
+                  <p className="text-gray-600 mb-4 leading-relaxed">
                     {truncateText(business.description, 200)}
                   </p>
 
-                  {/* Location and Date at the bottom */}
-                  <div className="flex flex-col sm:flex-row sm:justify-between text-sm text-gray-500 mt-auto">
-                    {formatLocation(business) && (
-                      <div className="mb-1 sm:mb-0">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-4 w-4 inline-block mr-1"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                          />
-                        </svg>
-                        {formatLocation(business)}
-                      </div>
-                    )}
-                    <div>Posted {formatDate(business.updated_at)}</div>
-                  </div>
+                  {/* Location */}
+                  {formatLocation(business) && (
+                    <div className="text-sm text-gray-500 mt-auto flex items-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4 mr-1 text-gray-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                      </svg>
+                      {formatLocation(business)}
+                    </div>
+                  )}
                 </div>
               </div>
             </Link>

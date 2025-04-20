@@ -37,7 +37,7 @@ export default function AuthPage() {
           .single();
 
         if (profile?.is_profile_complete) {
-          router.push('/dashboard');
+          router.push('/');
         } else {
           setView('complete-profile');
         }
@@ -70,7 +70,7 @@ export default function AuthPage() {
 
   // After profile completion, redirect to dashboard
   const handleProfileComplete = () => {
-    router.push('/dashboard');
+    router.push('/');
   };
 
   return (

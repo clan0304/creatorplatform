@@ -179,27 +179,53 @@ const ProfilePage = () => {
   };
 
   const validateUrls = () => {
+    // Simple URL pattern that accepts most valid URLs
     const urlPattern =
-      /^(https?:\/\/)?([\w-])+\.{1}([a-zA-Z]{2,63})([/\w-]*)*\/?$/;
+      /^(https?:\/\/)?[\w.-]+(\.\w+)+(\/[\w\-\._~:\/?#[\]@!$&'()*+,;=.]+)?$/;
 
-    if (instagramUrl && !urlPattern.test(instagramUrl)) {
-      setError('Invalid Instagram URL format');
+    // Specific pattern for each social media platform
+    const instagramPattern =
+      /^(https?:\/\/)?(www\.)?(instagram\.com|instagr\.am)\/[\w.-]+\/?$/i;
+    const youtubePattern =
+      /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/[\w\-\._~:\/?#[\]@!$&'()*+,;=.]+$/i;
+    const tiktokPattern =
+      /^(https?:\/\/)?(www\.)?(tiktok\.com\/@?[\w.-]+|vm\.tiktok\.com\/[\w.-]+)\/?$/i;
+
+    if (
+      instagramUrl &&
+      !urlPattern.test(instagramUrl) &&
+      !instagramPattern.test(instagramUrl)
+    ) {
+      setError(
+        'Invalid Instagram URL format. Please enter a valid Instagram profile URL.'
+      );
       return false;
     }
 
-    if (youtubeUrl && !urlPattern.test(youtubeUrl)) {
-      setError('Invalid YouTube URL format');
+    if (
+      youtubeUrl &&
+      !urlPattern.test(youtubeUrl) &&
+      !youtubePattern.test(youtubeUrl)
+    ) {
+      setError(
+        'Invalid YouTube URL format. Please enter a valid YouTube channel URL.'
+      );
       return false;
     }
 
-    if (tiktokUrl && !urlPattern.test(tiktokUrl)) {
-      setError('Invalid TikTok URL format');
+    if (
+      tiktokUrl &&
+      !urlPattern.test(tiktokUrl) &&
+      !tiktokPattern.test(tiktokUrl)
+    ) {
+      setError(
+        'Invalid TikTok URL format. Please enter a valid TikTok profile URL.'
+      );
       return false;
     }
 
     return true;
   };
-
   const uploadProfilePhoto = async (): Promise<string | undefined> => {
     if (!profilePhotoFile) return profile?.profile_photo_url;
 
