@@ -514,7 +514,7 @@ const CreatorContainer = ({
                             className="text-xs flex items-center"
                           >
                             <div className="w-2 h-2 rounded-full bg-indigo-500 mr-2"></div>
-                            <span className="font-medium text-indigo-700">
+                            <span className="font-medium text-color-secondary">
                               {schedule.city}, {schedule.country}:
                             </span>{' '}
                             <span className="text-indigo-600 ml-1">
@@ -563,8 +563,8 @@ const CreatorContainer = ({
                               key={schedule.id}
                               className="text-xs flex items-center"
                             >
-                              <div className="w-2 h-2 rounded-full bg-indigo-500 mr-2"></div>
-                              <span className="font-medium text-indigo-600">
+                              <div className="w-2 h-2 rounded-full bg-secondary mr-2"></div>
+                              <span className="font-medium text-secondary">
                                 {schedule.city}, {schedule.country}:
                               </span>{' '}
                               <span className="text-gray-600 ml-1">
@@ -656,7 +656,7 @@ const CreatorContainer = ({
                     >
                       <button
                         onClick={() => setIsProfileModalOpen(true)}
-                        className="flex items-center text-indigo-600 hover:text-indigo-800 text-sm font-medium bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors"
+                        className="flex items-center text-white hover:text-indigo-800 text-sm font-medium bg-primary hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"

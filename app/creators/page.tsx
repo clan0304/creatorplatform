@@ -183,7 +183,7 @@ const CreatorsPage = () => {
 
         {/* Filter/Search Section - Available to all users */}
         <form onSubmit={handleSearch} className="mb-6">
-          <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-3">
+          <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-3 md:items-center">
             <div className="flex-grow flex md:w-1/2">
               <input
                 type="text"
@@ -194,7 +194,7 @@ const CreatorsPage = () => {
               />
               <button
                 type="submit"
-                className="px-4 py-2 bg-indigo-600 text-white rounded-r-md hover:bg-indigo-700 transition-colors hover:cursor-pointer"
+                className="px-4 py-2 bg-primary font-semibold text-white rounded-r-md hover:bg-indigo-700 transition-colors hover:cursor-pointer"
               >
                 Search
               </button>
