@@ -31,7 +31,8 @@ interface CreatorProfile {
 interface TravelSchedule {
   id: string;
   creator_id: string;
-  location: string;
+  country: string; // Ensure this property exists
+  city: string; // Ensure this property exists
   start_date: string;
   end_date: string;
 }
@@ -128,15 +129,12 @@ const CreatorProfilePage = () => {
     const start = new Date(startDate);
     const end = new Date(endDate);
 
+    // Updated to always show year
     const options: Intl.DateTimeFormatOptions = {
       month: 'short',
       day: 'numeric',
+      year: 'numeric', // Always include year regardless of current year
     };
-
-    // Add year if not current year
-    if (start.getFullYear() !== new Date().getFullYear()) {
-      options.year = 'numeric';
-    }
 
     const formattedStart = start.toLocaleDateString('en-US', options);
     const formattedEnd = end.toLocaleDateString('en-US', options);
@@ -477,7 +475,7 @@ const CreatorProfilePage = () => {
                       className="bg-gray-50 p-3 rounded-lg flex flex-col"
                     >
                       <span className="font-medium text-indigo-600">
-                        {schedule.location}
+                        {schedule.city}, {schedule.country}
                       </span>
                       <span className="text-gray-600 text-sm">
                         {formatDateRange(

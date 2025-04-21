@@ -260,15 +260,12 @@ const CreatorContainer = ({
     const start = new Date(startDate);
     const end = new Date(endDate);
 
+    // Updated format options to always include year
     const options: Intl.DateTimeFormatOptions = {
       month: 'short',
       day: 'numeric',
+      year: 'numeric', // Always include year
     };
-
-    const currentYear = new Date().getFullYear();
-    if (start.getFullYear() !== currentYear) {
-      options.year = 'numeric';
-    }
 
     const formattedStart = start.toLocaleDateString('en-US', options);
     const formattedEnd = end.toLocaleDateString('en-US', options);
@@ -656,7 +653,7 @@ const CreatorContainer = ({
                     >
                       <button
                         onClick={() => setIsProfileModalOpen(true)}
-                        className="flex items-center text-white hover:text-indigo-800 text-sm font-medium bg-primary hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors"
+                        className="flex items-center text-white hover:opacity-70 hover:cursor-pointer text-sm font-medium bg-primary  px-3 py-1.5 rounded-lg transition-colors"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -677,7 +674,7 @@ const CreatorContainer = ({
                       {userHasTravelSchedule ? (
                         <button
                           onClick={() => setIsTravelModalOpen(true)}
-                          className="flex items-center text-indigo-600 hover:text-indigo-800 text-sm font-medium bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors"
+                          className="flex items-center text-primary hover:opacity-70 text-sm font-medium hover:cursor-pointer bg-white  px-3 py-1.5 rounded-lg transition-colors"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
